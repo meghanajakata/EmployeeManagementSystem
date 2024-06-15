@@ -1,0 +1,35 @@
+﻿@page "/flights"
+@inject EmployeeManagementSystem.Repository.IFlightRepository FlightRepository;
+@using EmployeeManagementSystem.Data;
+
+<h3>All Flights</h3>
+
+<table>
+    <thead>
+        <tr>
+            <td>Id</td>
+            <td>Name</td>
+            <td>Price</td>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach(var flight in flights)
+        {
+            <tr>
+                <td>@flight.Id</td>
+                <td>@flight.Name</td>
+                <td>@flight.Price</td>
+                <td><a class="btn-secondary" href="flights/@flight.Id">Edit</a></td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+    private List<EmployeeManagementSystem.Data.Flight> flights;
+
+    protected override void OnInitialized()
+    {
+        flights = FlightRepository.GetFlights();
+    }
+}

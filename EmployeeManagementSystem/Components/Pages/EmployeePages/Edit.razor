@@ -1,0 +1,97 @@
+﻿@page "/Employees/edit"
+@rendermode InteractiveServer
+@inject EmployeeManagementSystem.Data.EmployeeManagementSystemContext DB
+@using EmployeeManagementSystem.Data
+@inject NavigationManager NavigationManager
+@using Microsoft.EntityFrameworkCore
+
+<PageTitle>Edit</PageTitle>
+
+<h1>Edit</h1>
+
+<h4>Employee</h4>
+<hr />
+@if (Employee is null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-4">
+            <EditForm method="post" Model="Employee" OnValidSubmit="UpdateEmployee" FormName="edit" Enhance>
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+                <input type="hidden" name="Employee.Id" value="@Employee.Id" />
+                <div class="mb-3">
+                    <label for="name" class="form-label">Name:</label>
+                    <InputText id="name" @bind-Value="Employee.Name" class="form-control" />
+                    <ValidationMessage For="() => Employee.Name" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="salary" class="form-label">Salary:</label>
+                    <InputNumber id="salary" @bind-Value="Employee.Salary" class="form-control" />
+                    <ValidationMessage For="() => Employee.Salary" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="experience" class="form-label">Experience:</label>
+                    <InputNumber id="experience" @bind-Value="Employee.Experience" class="form-control" />
+                    <ValidationMessage For="() => Employee.Experience" class="text-danger" />
+                </div>
+                <button type="submit" class="btn btn-primary">Save</button>
+            </EditForm>
+        </div>
+    </div>
+}
+
+<div>
+    <a href="/employees">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromQuery]
+    public int Id { get; set; }
+
+    [SupplyParameterFromForm]
+    public Employee? Employee { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Employee ??= await DB.Employee.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (Employee is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+
+    // To protect from overposting attacks, enable the specific properties you want to bind to.
+    // For more details, see https://aka.ms/RazorPagesCRUD.
+    public async Task UpdateEmployee()
+    {
+        DB.Attach(Employee!).State = EntityState.Modified;
+
+        try
+        {
+            await DB.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!EmployeeExists(Employee!.Id))
+            {
+                NavigationManager.NavigateTo("notfound");
+            }
+            else
+            {
+                throw;
+            }
+        }
+
+        NavigationManager.NavigateTo("/employees");
+    }
+
+    bool EmployeeExists(int id)
+    {
+        return DB.Employee.Any(e => e.Id == id);
+    }
+}

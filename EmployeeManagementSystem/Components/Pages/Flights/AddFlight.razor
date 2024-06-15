@@ -1,0 +1,43 @@
+﻿@page "/flights/add"
+@inject EmployeeManagementSystem.Repository.IFlightRepository FlightRepository
+@inject NavigationManager Navigation
+
+
+<h3>Edit Flight</h3>
+
+
+<EditForm Model="@flight" OnValidSubmit=SubmitForm FormName="SubmitForm">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <div class="form-group">
+        <label for="id">Id</label>
+        <input id="id" class="form-control" name="id" value="@flight.Id" readonly />
+    </div>
+    <div class="form-group">
+        <label for="name">Name</label>
+        <InputText id="name" class="form-control" DisplayName="name" @bind-Value="@flight.Name" />
+    </div>
+    <div class="form-group">
+        <label for="price">Price</label>
+        <input id="price" class="form-control" DisplayName="price" @bind-value="@flight.Price" />
+    </div>
+    <button type="submit" class="btn-primary">Update</button>
+</EditForm>
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    private EmployeeManagementSystem.Data.Flight flight { get; set; }
+
+    protected override void OnInitialized()
+    {
+        flight = FlightRepository.GetFlightById(Id);
+    }
+
+    public void SubmitForm()
+    {
+        FlightRepository.UpdateFlight(flight);
+        Navigation.NavigateTo("/flights");
+    }
+}

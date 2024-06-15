@@ -1,0 +1,52 @@
+﻿@page "/employees/create"
+@inject EmployeeManagementSystem.Data.EmployeeManagementSystemContext DB
+@using EmployeeManagementSystem.Data
+@inject NavigationManager NavigationManager
+
+<PageTitle>Create</PageTitle>
+
+<h1>Create</h1>
+
+<h4>Employee</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <EditForm method="post" Model="Employee" OnValidSubmit="AddEmployee" FormName="create" Enhance>
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" />
+            <div class="mb-3">
+                <label for="name" class="form-label">Name:</label> 
+                <InputText id="name" @bind-Value="Employee.Name" class="form-control" /> 
+                <ValidationMessage For="() => Employee.Name" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="salary" class="form-label">Salary:</label> 
+                <InputNumber id="salary" @bind-Value="Employee.Salary" class="form-control" /> 
+                <ValidationMessage For="() => Employee.Salary" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="experience" class="form-label">Experience:</label> 
+                <InputNumber id="experience" @bind-Value="Employee.Experience" class="form-control" /> 
+                <ValidationMessage For="() => Employee.Experience" class="text-danger" /> 
+            </div>        
+            <button type="submit" class="btn btn-primary">Create</button>
+        </EditForm>
+    </div>
+</div>
+
+<div>
+    <a href="/employees">Back to List</a>
+</div>
+
+@code {
+
+    [SupplyParameterFromForm]
+    public Employee Employee { get; set; } = new();
+
+    public async Task AddEmployee()
+    {
+        DB.Employee.Add(Employee);
+        await DB.SaveChangesAsync();
+        NavigationManager.NavigateTo("/employees");
+    }
+}
