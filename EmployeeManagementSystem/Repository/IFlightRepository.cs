@@ -9,5 +9,9 @@ namespace EmployeeManagementSystem.Repository
         public Flight GetFlightById(int Id);
 
         public void UpdateFlight(Flight flight);
+
+        public bool AddFlight(Flight flight);
+
+        public void DeleteFlight(int Id);
     }
 }

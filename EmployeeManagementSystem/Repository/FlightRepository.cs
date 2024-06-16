@@ -29,6 +29,34 @@ namespace EmployeeManagementSystem.Repository
             if(_flight != null)
             {
                 _flight.Name = flight.Name;
+                _flight.Price = flight.Price;
+                _context.SaveChanges();
+            }
+        }
+
+        public Flight GetFlightByName(string Name)
+        {
+            var _flight = _context.Flights.SingleOrDefault(flight => flight.Name == Name);
+            return _flight;
+        }
+
+
+        public bool AddFlight(Flight flight)
+        {
+            var _flight = GetFlightByName(flight.Name);
+            if(_flight != null)
+                return false;
+            _context.Flights.Add(flight);
+            _context.SaveChanges();
+            return true;
+        }
+
+        public void DeleteFlight(int id)
+        {
+            var _flight = _context.Flights.FirstOrDefault(flight => flight.Id == id);
+            if(_flight != null)
+            {
+                _context.Remove(_flight);
                 _context.SaveChanges();
             }
         }

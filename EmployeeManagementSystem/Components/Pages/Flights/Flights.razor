@@ -1,15 +1,20 @@
 ﻿@page "/flights"
-@inject EmployeeManagementSystem.Repository.IFlightRepository FlightRepository;
+@inject EmployeeManagementSystem.Repository.IFlightRepository FlightRepository
+@inject NavigationManager Navigation
 @using EmployeeManagementSystem.Data;
+
+
+<a class="btn btn-primary" href="flights/0" role="button">Add Flight</a>
 
 <h3>All Flights</h3>
 
-<table>
+<table class="table">
     <thead>
         <tr>
             <td>Id</td>
             <td>Name</td>
             <td>Price</td>
+            <td>Actions</td>
         </tr>
     </thead>
     <tbody>
@@ -19,7 +24,10 @@
                 <td>@flight.Id</td>
                 <td>@flight.Name</td>
                 <td>@flight.Price</td>
-                <td><a class="btn-secondary" href="flights/@flight.Id">Edit</a></td>
+                <td>
+                    <a class="btn btn-secondary" href="flights/@flight.Id" role="button">Edit</a> |
+                    <button class="btn btn-danger" @onclick="@(() => DeleteFlight(flight.Id))">Delete</button>
+                </td>
             </tr>
         }
     </tbody>
@@ -31,5 +39,11 @@
     protected override void OnInitialized()
     {
         flights = FlightRepository.GetFlights();
+    }
+
+    private void DeleteFlight(int Id)
+    {
+        FlightRepository.DeleteFlight(Id);
+        Navigation.NavigateTo("/flights");
     }
 }

@@ -1,4 +1,5 @@
 ﻿@page "/flights/{id:int}"
+@inject EmployeeManagementSystem.Data.EmployeeManagementSystemContext DB
 @inject EmployeeManagementSystem.Repository.IFlightRepository FlightRepository
 @inject NavigationManager Navigation
 
@@ -6,7 +7,7 @@
 <h3>Edit Flight</h3>
 
 
-<EditForm  Model="@flight" OnValidSubmit=SubmitForm FormName="SubmitForm">
+@* <EditForm  Model="@flight" OnValidSubmit=SubmitForm FormName="SubmitForm">
     <DataAnnotationsValidator />
     <ValidationSummary />
     <div class="form-group">
@@ -19,27 +20,69 @@
     </div>
     <div class="form-group">
         <label for="price" >Price</label>
-        <InputText id="price" class="form-control" DisplayName="price" @bind-value="@flight.Price" />
+        <input id="price" class="form-control" DisplayName="price" @bind-value="@flight.Price" />
     </div>
     <button type="submit" class="btn-primary">Update</button>
-</EditForm>
+</EditForm> *@
+
+
+<div class="row">
+    <div class="col-md-4">
+     @*    @if (!string.IsNullOrEmpty(ErrorMessage))
+        {
+            <div class="alert alert-danger mt-3">
+                @ErrorMessage
+            </div>
+        } *@
+        <EditForm method="post" Model="flight" OnValidSubmit="SubmitForm" FormName="edit">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+            <input type="hidden" name="Id" value="@(flight?.Id)" />.
+
+            <div class="mb-3">
+                <label for="name" class="form-label">Name:</label>
+                <InputText id="name" @bind-Value="flight.Name" class="form-control" />
+                <ValidationMessage For="() => flight.Name" class="text-danger" />
+            </div>
+            <div class="mb-3">
+                <label for="salary" class="form-label">Price:</label>
+                <InputNumber id="salary" @bind-Value="flight.Price" class="form-control" />
+                <ValidationMessage For="() => flight.Price" class="text-danger" />
+            </div>
+            <button type="submit" class="btn btn-primary">Save</button>
+        </EditForm>
+    </div>
+</div>
 
 @code {
     [Parameter]
     public int Id { get; set; }
 
-    [SupplyParameterFromForm(FormName = "SubmitForm")]
-    private EmployeeManagementSystem.Data.Flight flight { get; set; }
+    [SupplyParameterFromForm]
+    private EmployeeManagementSystem.Data.Flight? flight { get; set; }
+
+    private string ErrorMessage { get; set; }
+
 
     protected override void OnInitialized()
     {
-
-        flight = FlightRepository.GetFlightById(Id);
+        if (Id == 0 && flight == null)
+            flight = new EmployeeManagementSystem.Data.Flight();
+        flight ??= FlightRepository.GetFlightById(Id);
     }
 
     public void SubmitForm()
     {
-        FlightRepository.UpdateFlight(flight);
-        Navigation.NavigateTo("/flights");
+        if(flight.Id != 0)
+        {
+            FlightRepository.UpdateFlight(flight);
+            Navigation.NavigateTo("/flights");
+        }
+        bool isFlightAdded = FlightRepository.AddFlight(flight);
+        if(isFlightAdded)
+        {
+            Navigation.NavigateTo("/flights");
+        }
+      
     }
 }
